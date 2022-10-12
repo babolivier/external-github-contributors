@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "external-github-contributors"
+version = "1.0.0"
+description = "Simple script to list external contributors to a project who authored contributions between two specific references"
+authors = ["Brendan Abolivier <git@brendanabolivier.com>"]
+readme = "README.md"
+packages = [{include = "external_github_contributors"}]
+
+[tool.poetry.scripts]
+external_github_contributors = "external_github_contributors:main"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "^2.28.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
