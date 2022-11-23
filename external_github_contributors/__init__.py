@@ -175,7 +175,3 @@ def main() -> None:
             print(f"- [{display_name}](https://github.com/{contributor})")
         else:
             print(f"- {contributor}")
-
-
-if __name__ == "__main__":
-    main()

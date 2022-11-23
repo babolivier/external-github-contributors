@@ -5,6 +5,14 @@ GitHub-hosted project within a range defined by two given Git references.
 
 ## Install
 
+This project can be installed via `pip`:
+
+```commandline
+pip install external-github-contributors
+```
+
+### Install from source
+
 This project uses [Poetry](https://python-poetry.org/) to manage its dependencies. Poetry
 needs to be installed in order to be able to follow the installation and usage
 instructions.
@@ -19,7 +27,10 @@ poetry install
 
 ## Usage
 
-In your local checkout of this repository, run `poetry run external_github_contributors [args]`.
+If you have installed this project using `pip`, run `python -m external_github_contributors`.
+
+If you have installed this project from source, in your local checkout of this repository,
+run `poetry run external_github_contributors [args]`.
 
 A complete synopsis is available below:
 
@@ -48,7 +59,7 @@ committed to the [matrix-org/synapse](https://github.com/matrix-org/synapse) rep
 between Synapse 1.68 and Synapse 1.69:
 
 ```
-poetry run external_github_contributors --team=matrix-org/teams/core-team --repo=matrix-org/synapse v1.68.0 v1.69.0
+python -m external_github_contributors --team=matrix-org/teams/core-team --repo=matrix-org/synapse v1.68.0 v1.69.0
 10 external contributors found after looking at 114 commits:
 - ...
 ```
