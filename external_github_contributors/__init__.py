@@ -12,7 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 import argparse
-import json
 import os
 import sys
 
@@ -62,6 +61,16 @@ def main() -> None:
             " GITHUB_TOKEN environment variable."
         ),
     )
+    parser.add_argument(
+        "--md",
+        action="store_true",
+        help=(
+            "If provided, prints the contributors as markdown links. The text for the"
+            " link is the user's display name (e.g. full name) as configured in their"
+            " GitHub profile. This option requires an additional API call for each"
+            " contributor, and therefore introduces additional delay."
+        ),
+    )
 
     args = parser.parse_args()
 
@@ -76,6 +85,8 @@ def main() -> None:
                 file=sys.stderr,
             )
             exit(1)
+
+    headers = {"Authorization": f"Bearer {github_token}"}
 
     # Build the URLs we'll need for API requests.
     compare_url = f"https://api.github.com/repos/{args.repo}/compare/{args.oldest_ref}...{args.most_recent_ref}"
@@ -92,7 +103,7 @@ def main() -> None:
         exit(1)
 
     # Get the author's login for each commit.
-    commits = json.loads(res.content)["commits"]
+    commits = res.json()["commits"]
     contributors = {
         commit["author"]["login"]
         for commit in commits
@@ -110,17 +121,17 @@ def main() -> None:
     while last_count == MAX_TEAM_MEMBERS_PER_PAGE:
         # Get a new page of the members list for this team.
         url = team_members_url % {"page": page}
-        res = requests.get(url, headers={"Authorization": f"Bearer {github_token}"})
+        res = requests.get(url, headers=headers)
         if res.status_code != 200:
             print(
                 f"GitHub API responded to /members request with non-200 status"
-                f" {res.status_code} and message: {res.content['message']}",
+                f" {res.status_code} and message: {res.json()['message']}",
                 file=sys.stderr,
             )
             exit(1)
 
         # Store the members of the team.
-        raw_members = json.loads(res.content)
+        raw_members = res.json()
         members.update({member["login"] for member in raw_members})
 
         page += 1
@@ -142,7 +153,28 @@ def main() -> None:
     )
 
     for contributor in external_contributors:
-        print(f"- {contributor}")
+        if args.md:
+            display_name = contributor
+
+            res = requests.get(
+                f"https://api.github.com/users/{contributor}",
+                headers=headers,
+            )
+            if res.status_code == 200:
+                user_name = res.json().get("name")
+                if user_name is not None:
+                    display_name = user_name
+            else:
+                print(
+                    f"Failed to get profile of {contributor} (falling back to username):"
+                    f" GitHub responded with status {res.status_code} and message:"
+                    f" {res.json()['message']}",
+                    file=sys.stderr,
+                )
+
+            print(f"- [{display_name}](https://github.com/{contributor})")
+        else:
+            print(f"- {contributor}")
 
 
 if __name__ == "__main__":
