@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "external-github-contributors"
-version = "1.0.0"
+version = "1.1.0"
 description = "Simple script to list external contributors to a project who authored contributions between two specific references"
 authors = ["Brendan Abolivier <git@brendanabolivier.com>"]
 readme = "README.md"
